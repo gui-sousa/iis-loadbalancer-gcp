@@ -1,10 +1,7 @@
-name: 'Terraform CI'
+name: 'Terraform Destroy'
 
 on:
-  push:
-    branches:
-    - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -20,22 +17,12 @@ jobs:
       with:
         terraform_version: 0.15.5
 
-
     - name: Terraform Init
       run: terraform init
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-    
-    - name: Terraform Format
-      run: terraform fmt -check
-
-    - name: Terraform Plan
-      run: terrafrom plan
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: Terraform Apply
-      if: github.ref == 'refs/head/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+      run: terraform destroy --auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
