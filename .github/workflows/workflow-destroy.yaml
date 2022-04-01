@@ -17,12 +17,7 @@ jobs:
       with:
         terraform_version: 0.15.5
 
-    - name: Terraform Init
-      run: terraform init
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-    - name: Terraform Apply
+    - name: Terraform Destroy
       run: terraform destroy --auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
