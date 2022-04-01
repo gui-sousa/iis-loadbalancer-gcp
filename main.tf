@@ -1,4 +1,6 @@
 terraform {
+  required_version = "0.15.5"
+  
   backend "gcs" {
     bucket      = "bkt-iis-loadbalancer"
     prefix      = "dev"
