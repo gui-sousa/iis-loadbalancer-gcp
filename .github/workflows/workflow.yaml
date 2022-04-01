@@ -1,4 +1,4 @@
-name: 'Terraform CI'
+name: 'Terraform Apply'
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
       run: terraform fmt
 
     - name: Terraform Plan
-      run: terrafrom plan
+      run: terraform plan
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
