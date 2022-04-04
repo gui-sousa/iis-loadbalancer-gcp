@@ -1,12 +1,11 @@
 terraform {
-  required_version = "0.15.5"
-  
   backend "gcs" {
     bucket      = "bkt-iis-loadbalancer"
     prefix      = "dev"
     credentials = "gcp-dev.json"
   }
 }
+
 
 provider "google" {
   credentials = file("gcp-dev.json")
