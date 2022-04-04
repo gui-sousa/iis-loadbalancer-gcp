@@ -39,3 +39,4 @@ jobs:
       run: terraform apply -auto-approve
       with:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
