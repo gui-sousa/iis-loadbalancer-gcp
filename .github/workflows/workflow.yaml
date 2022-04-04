@@ -17,13 +17,13 @@ jobs:
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
-      with:
+      env:
         terraform_version: 0.15.5
 
 
     - name: Terraform Init
       run: terraform init
-      with:
+      env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
     
     - name: Terraform Format
@@ -31,12 +31,12 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan
-      with:
+      env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: Terraform Apply
       if: github.ref == 'refs/head/main' && github.event_name == 'push'
       run: terraform apply -auto-approve
-      with:
+      env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
