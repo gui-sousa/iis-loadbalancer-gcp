@@ -1,5 +1,5 @@
 resource "google_compute_instance" "instancia-teste" {
-   name = "iis-lab-test01"
+   name = "iis-lab-test001"
    machine_type = "${var.tipo-vm}"
    zone = "${var.zona}"
    boot_disk {
