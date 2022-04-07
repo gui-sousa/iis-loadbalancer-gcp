@@ -1,9 +1,9 @@
-name: 'Terraform Apply'
+name: 'Terraform Plan'
 
 on:
   push:
     branches:
-    - main
+    - dev
 
 jobs:
   terraform:
@@ -30,12 +30,6 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-    - name: Terraform Apply
-      if: github.ref == 'refs/head/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
