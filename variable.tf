@@ -3,7 +3,7 @@ variable "regiao" {
 }
 
 variable "projeto" {
-  default = "adfs-343320"
+  default = "balancer-346514"
 }
 
 variable "tipo-vm" {
@@ -12,4 +12,8 @@ variable "tipo-vm" {
 
 variable "zona" {
   default = "us-east1-b"
+}
+
+variable "imagem" {
+  default = "windows-server-2019-dc-core-v20220314"
 }
