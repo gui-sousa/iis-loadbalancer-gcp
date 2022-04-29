@@ -18,11 +18,11 @@ jobs:
         terraform_version: 0.15.5
 
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend=true -backend-config="ambientes/prod/backend.tf"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}
 
     - name: Terraform Destroy
-      run: terraform destroy --auto-approve
+      run: terraform destroy -var-file=ambientes/prod/vars-prod.tfvars -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}

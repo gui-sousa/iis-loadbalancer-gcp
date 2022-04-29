@@ -21,7 +21,7 @@ jobs:
 
 
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
@@ -29,17 +29,17 @@ jobs:
       run: terraform fmt
 
     - name: Terraform Plan
-      run: terraform plan
+      run: terraform plan -var-file=ambientes/dev/vars-dev.tfvars -out "iis-lb.txt"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve
+      run: terraform apply "iis-lb.txt"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
     - name: Terraform Destroy
-      run: terraform destroy --auto-approve
+      run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
