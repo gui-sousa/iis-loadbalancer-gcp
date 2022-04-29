@@ -23,7 +23,7 @@ jobs:
     - name: Terraform Init
       run: terraform init
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
     - name: Terraform Format
       run: terraform fmt
@@ -31,15 +31,15 @@ jobs:
     - name: Terraform Plan
       run: terraform plan
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
     - name: Terraform Apply
       run: terraform apply -auto-approve
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
     - name: Terraform Destroy
       run: terraform destroy --auto-approve
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
