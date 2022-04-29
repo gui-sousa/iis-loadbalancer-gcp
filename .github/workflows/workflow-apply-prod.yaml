@@ -1,7 +1,9 @@
-name: 'Terraform Destroy'
+name: 'Terraform Apply - Produção'
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+    - master
 
 jobs:
   terraform:
@@ -14,15 +16,24 @@ jobs:
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
-      with:
+      env:
         terraform_version: 0.15.5
+
 
     - name: Terraform Init
       run: terraform init
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+    
+    - name: Terraform Format
+      run: terraform fmt
 
-    - name: Terraform Destroy
-      run: terraform destroy --auto-approve
+    - name: Terraform Plan
+      run: terraform plan
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}

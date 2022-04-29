@@ -1,9 +1,11 @@
 variable "regiao" {
-  default = "us-east1"
+  default = "us-central1"
 }
 
 variable "projeto" {
-  default = "adfs-343320"
+}
+
+variable "credenciais" {
 }
 
 variable "tipo-vm" {
@@ -11,5 +13,5 @@ variable "tipo-vm" {
 }
 
 variable "zona" {
-  default = "us-east1-b"
+  default = "us-central1-a"
 }

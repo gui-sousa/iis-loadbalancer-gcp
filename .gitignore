@@ -1,5 +1,6 @@
 iis-lb.txt
 gcp-dev.json
+gcp-prod.json
 **/.terraform/*
 *.tfstate.lock.info
 crash.log
