@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
@@ -38,19 +38,28 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
-    - name: Terraform Destroy
-      run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-  
+
   golang:
     name: 'Teste'
     runs-on: ubuntu-latest
     needs: Terraform
-
+    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: '1.16.1'
       - run: go run monitora.go
+
+  destroy:
+    name: Destroy
+    runs-on: ubuntu-latest
+    needs: golang
+
+    steps:
+      - uses: actions/checkout@v3
+     
+      - name: Terraform Destroy
+        run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
