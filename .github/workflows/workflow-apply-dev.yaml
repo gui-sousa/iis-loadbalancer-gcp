@@ -5,6 +5,7 @@ on:
     branches:
     - dev
 
+
 jobs:
   terraform:
     name: 'Terraform - Desevolvimento'
@@ -45,7 +46,7 @@ jobs:
     needs: Terraform
     
     steps:
-      - uses: actions/checkout@v3
+    #  - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: '1.16.1'
@@ -57,7 +58,7 @@ jobs:
     needs: golang
 
     steps:
-      - uses: actions/checkout@v3
+     # - uses: actions/checkout@v3
      
       - name: Terraform Destroy
         run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
