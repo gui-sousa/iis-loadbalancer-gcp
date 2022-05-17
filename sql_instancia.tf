@@ -1,4 +1,4 @@
-resource "google_compute_instance" "server" {
+resource "google_compute_instance" "instancia-sql" {
   for_each = var.server
 
   name         = each.key

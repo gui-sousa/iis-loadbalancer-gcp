@@ -1,4 +1,4 @@
-resource "google_compute_instance" "instancia-teste" {
+resource "google_compute_instance" "instancia-iis" {
   name         = "iis-lab-test1"
   machine_type = var.tipo-vm
   zone         = var.zona
