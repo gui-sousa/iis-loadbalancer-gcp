@@ -44,8 +44,8 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
     
-    - name: 'Teste'
-      run: go run monitora.go
+   # - name: 'Teste'
+     # run: go run monitora.go
      
     - name: Terraform Destroy
       run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve

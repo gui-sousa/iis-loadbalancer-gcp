@@ -20,6 +20,15 @@ resource "google_compute_firewall" "tcp-rule" {
     name = "iis-tcp-rule"
     network = google_compute_network.sql.id
     allow {
+      protocol = "icmp"
+    }
+
+    allow {
+      protocol = "udp"
+      ports = ["0-65535"]
+    }
+    
+    allow {
       protocol = "tcp"
       ports = ["0-65535"]
     }
