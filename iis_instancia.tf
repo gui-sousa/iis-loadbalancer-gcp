@@ -1,5 +1,5 @@
 resource "google_compute_instance" "instancia-iis" {
-  name         = "iis-lab-test1"
+  name         = "bookshelf-iis"
   machine_type = var.tipo-vm
   zone         = var.zona
   boot_disk {
@@ -10,7 +10,8 @@ resource "google_compute_instance" "instancia-iis" {
 
   #Define Configuração de Rede
   network_interface {
-    network = "default"
+    subnetwork = google_compute_subnetwork.sql1.name
+    network_ip = "10.3.0.9"
     access_config {}
   }
 

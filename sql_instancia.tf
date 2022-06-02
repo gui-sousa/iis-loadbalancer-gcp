@@ -12,11 +12,17 @@ resource "google_compute_instance" "instancia-sql" {
 
   #Define Configuração de Rede
   network_interface {
-    network = "default"
+    subnetwork = each.value["subnet"]
+    network_ip = each.value["ip"]
     access_config {}
   }
 
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
   }
+
+  depends_on = [
+    google_compute_subnetwork.sql1,
+    google_compute_subnetwork.sql2
+  ]
 }

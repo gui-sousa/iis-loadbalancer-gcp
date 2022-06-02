@@ -25,6 +25,12 @@ jobs:
       env:
         terraform_version: 0.15.5
 
+ #   - name: Setup Google Cloud
+ #     uses: actions-hub/gcloud@master
+  #    env:
+  #      PROJECT_ID: "develop-348618"
+  #      APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+
 
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
