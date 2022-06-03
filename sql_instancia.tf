@@ -12,10 +12,13 @@ resource "google_compute_instance" "instancia-sql" {
 
   #Define Configuração de Rede
   network_interface {
-    subnetwork = each.value["subnet"]
-    network_ip = each.value["ip"]
+    for_each = var.lan
+
+    subnetwork = each.value["subnetwork"]
+    network_ip = each.value["network_ip"]
     access_config {}
   }
+
 
   service_account {
     scopes = ["userinfo-email", "compute-ro", "storage-ro"]
