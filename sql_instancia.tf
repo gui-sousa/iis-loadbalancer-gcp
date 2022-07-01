@@ -12,9 +12,7 @@ resource "google_compute_instance" "instancia-sql" {
 
   #Define Configuração de Rede
   network_interface {
-    for_each = var.lan
-
-    subnetwork = each.value["subnetwork"]
+    network    = google_compute_subnetwork.sql0.name
     network_ip = each.value["network_ip"]
     access_config {}
   }
@@ -25,7 +23,7 @@ resource "google_compute_instance" "instancia-sql" {
   }
 
   depends_on = [
-    google_compute_subnetwork.sql1,
-    google_compute_subnetwork.sql2
+    google_compute_subnetwork.sql0,
+    google_compute_subnetwork.sql1
   ]
 }
