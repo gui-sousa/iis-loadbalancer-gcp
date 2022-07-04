@@ -1,9 +1,7 @@
-resource "google_compute_instance" "instancia-sql" {
-  for_each = var.server
-
-  name         = each.key
-  machine_type = each.value["machine_type"]
-  zone         = each.value["zone"]
+resource "google_compute_instance" "instancia-sql-1" {
+  name         = "bookshelf-sql1"
+  machine_type = var.tipo-vm
+  zone         = var.zona
   boot_disk {
     initialize_params {
       image = "windows-sql-cloud/sql-2019-standard-windows-2022-dc-v20220418"
@@ -12,8 +10,9 @@ resource "google_compute_instance" "instancia-sql" {
 
   #Define Configuração de Rede
   network_interface {
-    network    = google_compute_subnetwork.sql0.name
-    network_ip = each.value["network_ip"]
+    network    = google_compute_network.sql.name
+    subnetwork = google_compute_subnetwork.sql1.name
+    network_ip = var.ip-sql1
     access_config {}
   }
 
@@ -23,7 +22,38 @@ resource "google_compute_instance" "instancia-sql" {
   }
 
   depends_on = [
-    google_compute_subnetwork.sql0,
-    google_compute_subnetwork.sql1
+    google_compute_network.sql,
+    google_compute_subnetwork.sql1,
+    google_compute_subnetwork.sql2
+  ]
+}
+
+resource "google_compute_instance" "instancia-sql-2" {
+  name         = "bookshelf-sql2"
+  machine_type = var.tipo-vm
+  zone         = var.zona
+  boot_disk {
+    initialize_params {
+      image = "windows-sql-cloud/sql-2019-standard-windows-2022-dc-v20220418"
+    }
+  }
+
+  #Define Configuração de Rede
+  network_interface {
+    network    = google_compute_network.sql.name
+    subnetwork = google_compute_subnetwork.sql2.name
+    network_ip = var.ip-sql2
+    access_config {}
+  }
+
+
+  service_account {
+    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+  }
+
+  depends_on = [
+    google_compute_network.sql,
+    google_compute_subnetwork.sql1,
+    google_compute_subnetwork.sql2
   ]
 }
