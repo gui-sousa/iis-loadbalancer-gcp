@@ -18,10 +18,12 @@ jobs:
     - name: Montando Imagem
       uses: hashicorp/packer-github-actions@master
       with:
-        command: build
-        arguments: -var-file="ambientes/dev/vars-dev.json"
-        target: "packer/pkr-ad-imagem.json"
+        command: packer build -var-file="ambientes/dev/vars-dev.json" ./packer/pkr-ad-imagem.json
+        #arguments: -var-file="ambientes/dev/vars-dev.json"
+        #target: "packer/pkr-ad-imagem.json"
         #working_directory: ./packer
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
   terraform:
     name: 'Terraform - Desevolvimento'
