@@ -7,10 +7,26 @@ on:
 
 
 jobs:
+  Build_Image:
+    name: Packer
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Montando Imagem
+      uses: hashicorp/packer-github-actions@master
+      with:
+        command: build
+        arguments: -var-file="ambientes/dev/vars-dev.json"
+        target: pkr-ad-imagem.json
+        working_directory: ./packer
+
   terraform:
     name: 'Terraform - Desevolvimento'
     runs-on: ubuntu-latest
-
+  
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -34,14 +50,6 @@ jobs:
   #    env:
   #      PROJECT_ID: "develop-348618"
   #      APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-
-    - name: Montando Imagem
-      uses: hashicorp/packer-github-actions@master
-      with:
-        command: build
-        arguments: -var-file="ambientes/dev/vars-dev.json"
-        target: pkr-ad-imagem.json
-        working_directory: ./packer
       
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
