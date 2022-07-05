@@ -2,7 +2,7 @@
     "builders": [
       {
         "type": "googlecompute",
-        "account_file": "${{ secrets.GOOGLE_CREDENTIALS_DEV }}",
+        "account_file": "{{ env `GOOGLE_CREDENTIALS_DEV` }}",
         "project_id": "{{user `projeto`}}",
         "instance_name": "homolog-windows-server-adfs",
         "image_name": "windows-server-winrm",
