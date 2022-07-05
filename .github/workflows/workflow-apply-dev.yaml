@@ -25,13 +25,21 @@ jobs:
       env:
         terraform_version: 0.15.5
 
+    - name: Setup Packer
+      uses: hashicorp/packer-github-actions@master
+
+
  #   - name: Setup Google Cloud
  #     uses: actions-hub/gcloud@master
   #    env:
   #      PROJECT_ID: "develop-348618"
   #      APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
-
+    - name: Montando Imagem
+      run: packer build -var-file="ambientes/dev/vars-dev.json" ./packer/pkr-ad-imagem.json
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+      
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
       env:
