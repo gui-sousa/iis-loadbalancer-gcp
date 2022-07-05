@@ -19,7 +19,7 @@ jobs:
       uses: hashicorp/packer-github-actions@master
       with:
         command: build
-        arguments: -var-file="./ambientes/dev/vars-dev.json"
+        arguments: -var-file=ambientes/dev/vars-dev.json
         target: ./packer/pkr-ad-imagem.json
         #working_directory: /packer
       env:
