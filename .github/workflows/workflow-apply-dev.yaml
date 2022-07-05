@@ -26,7 +26,7 @@ jobs:
         with:
           main_file: ./packer/pkr-ad-imagem.json
           variable_file: ./ambientes/dev/vars-dev.json
-          working_directory: packer/
+          working_directory: .
   
   #Build_Image:
   #  name: Packer
