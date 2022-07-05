@@ -20,7 +20,7 @@ jobs:
       with:
         command: build
         arguments: -var-file="ambientes/dev/vars-dev.json"
-        target: pkr-ad-imagem.json
+        target: "packer/pkr-ad-imagem.json"
         #working_directory: ./packer
 
   terraform:
@@ -39,11 +39,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       env:
-        terraform_version: 0.15.5
-
-    - name: Setup Packer
-      uses: hashicorp/packer-github-actions@master
-
+        terraform_version: 0.15.5 
 
  #   - name: Setup Google Cloud
  #     uses: actions-hub/gcloud@master
