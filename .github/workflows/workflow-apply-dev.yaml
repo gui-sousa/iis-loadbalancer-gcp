@@ -20,8 +20,8 @@ jobs:
       with:
         command: build
         arguments: -var-file="/home/runner/work/iis-loadbalancer-gcp/ambientes/dev/vars-dev.json"
-        target: "packer/pkr-ad-imagem.json"
-        working_directory: ./packer
+        target: pkr-ad-imagem.json
+        working_directory: /home/runner/work/iis-loadbalancer-gcp/packer
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
