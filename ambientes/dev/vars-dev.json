@@ -1,6 +1,6 @@
 {
 
-    "chave" : "{{env `GOOGLE_CREDENTIALS_DEV`}}",
+    "chave" : "",
     "projeto" : "develop-348618"
 
 }
