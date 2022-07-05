@@ -7,23 +7,44 @@ on:
 
 
 jobs:
-  Build_Image:
-    name: Packer
+  packer-build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      # Checking out the source Code
+      - name: Checkout the Source Code
+        uses: "actions/checkout@v3"
 
-    - name: Montando Imagem
-      uses: hashicorp/packer-github-actions@master
-      with:
-        command: build
-        arguments: -var-file=ambientes/dev/vars-dev.json
-        target: ./packer/pkr-ad-imagem.json
+      # Authenticating with GCP using Service Account Key
+      - name: Configure Authentication with GCP
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+
+      # Building Image using Packer
+      - name: Build Image
+        uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
+        with:
+          main_file: ./packer/pkr-ad-imagem.json
+          variable_file: ./ambientes/dev/vars-dev.json
+          working_directory: packer/
+  
+  #Build_Image:
+  #  name: Packer
+  #  runs-on: ubuntu-latest
+
+   # steps:
+   # - name: Checkout
+   #   uses: actions/checkout@v3
+
+   # - name: Montando Imagem
+   #   uses: hashicorp/packer-github-actions@master
+   #   with:
+   #     command: build
+   #     arguments: -var-file=ambientes/dev/vars-dev.json
+   #     target: ./packer/pkr-ad-imagem.json
         #working_directory: /packer
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+   #   env:
+    #    GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
   terraform:
     name: 'Terraform - Desevolvimento'
