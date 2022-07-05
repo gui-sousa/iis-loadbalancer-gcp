@@ -23,7 +23,7 @@ jobs:
         target: ./packer/pkr-ad-imagem.json
         #working_directory: /packer
       env:
-        GOOGLE_CREDENTIALS_DEV: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
   terraform:
     name: 'Terraform - Desevolvimento'
