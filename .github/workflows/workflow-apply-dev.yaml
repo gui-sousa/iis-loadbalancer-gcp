@@ -36,9 +36,12 @@ jobs:
   #      APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
     - name: Montando Imagem
-      run: packer build -var-file="ambientes/dev/vars-dev.json" ./packer/pkr-ad-imagem.json
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+      uses: hashicorp/packer-github-actions@master
+      with:
+        command: build
+        arguments: -var-file="ambientes/dev/vars-dev.json"
+        target: pkr-ad-imagem.json
+        working_directory: ./packer
       
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
