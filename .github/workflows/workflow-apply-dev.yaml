@@ -28,6 +28,7 @@ jobs:
   terraform:
     name: 'Terraform - Desevolvimento'
     runs-on: ubuntu-latest
+    needs: packer-build
   
     steps:
     - name: Checkout
