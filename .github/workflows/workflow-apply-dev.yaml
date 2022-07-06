@@ -5,7 +5,6 @@ on:
     branches:
     - dev
 
-
 jobs:
   packer:
     name: Build
@@ -35,22 +34,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: GoLang
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.16.1'
-
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       env:
         terraform_version: 0.15.5 
-
- #   - name: Setup Google Cloud
- #     uses: actions-hub/gcloud@master
-  #    env:
-  #      PROJECT_ID: "develop-348618"
-  #      APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-      
+     
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
       env:
@@ -68,11 +56,19 @@ jobs:
       run: terraform apply "iis-lb.txt"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-    
-   # - name: 'Teste'
-     # run: go run monitora.go
-     
+         
     - name: Terraform Destroy
       run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+
+#  golang:
+#    name: 'Teste'
+#
+#    - name: GoLang
+#      uses: actions/setup-go@v3
+#      with:
+#        go-version: '1.16.1'
+#
+#    - name: 'Teste'
+#      run: go run monitora.go
