@@ -38,6 +38,9 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       env:
         terraform_version: 0.15.5 
+
+    - name: Setup Ansible
+      uses: dawidd6/action-ansible-playbook@v2
      
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
