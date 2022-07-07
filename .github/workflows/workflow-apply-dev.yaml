@@ -39,16 +39,6 @@ jobs:
       env:
         terraform_version: 0.15.5 
 
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install ansible==2.9.2 requests
-     
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/dev/backend.tf"
       env:
@@ -71,6 +61,32 @@ jobs:
       run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+
+  ansible:
+    name: 'Config'
+    runs-on: ubuntu-latest
+    needs: terraform
+
+    steps:
+      - name: Checa codigo fonte
+        uses: "actions/checkout@v3"
+
+      - name: Configura autenticação no GCP
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+
+      - name: Sleep for 30 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '130s'
+
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: playbook.yml
+          directory: ./
+          inventory: hosts.ini
 
 #  golang:
 #    name: 'Teste'
