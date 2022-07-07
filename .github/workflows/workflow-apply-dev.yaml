@@ -57,10 +57,10 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
          
-    - name: Terraform Destroy
-      run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+ #   - name: Terraform Destroy
+  #    run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
+  #    env:
+  #      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
   ansible:
     name: 'Config'
