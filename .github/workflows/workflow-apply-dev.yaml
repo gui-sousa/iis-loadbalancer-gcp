@@ -57,36 +57,21 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
          
- #   - name: Terraform Destroy
-  #    run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
-  #    env:
-  #      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
+    - name: Sleep for 30 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+       time: '130s'
 
-  ansible:
-    name: 'Config'
-    runs-on: ubuntu-latest
-    needs: terraform
-
-    steps:
-      - name: Checa codigo fonte
-        uses: "actions/checkout@v3"
-
-      - name: Configura autenticação no GCP
-        uses: "google-github-actions/auth@v0"
-        with:
-          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-
-      - name: Sleep for 30 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '130s'
-
-      - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: playbook.yml
-          directory: ./
-          inventory: hosts.ini
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+       playbook: ./playbook.yml
+       inventory: hosts.ini
+  
+    - name: Terraform destroy
+      run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
 #  golang:
 #    name: 'Teste'
