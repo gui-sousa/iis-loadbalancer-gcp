@@ -56,7 +56,16 @@ jobs:
       run: terraform apply "iis-lb.txt"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
-         
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: |
+        pip install pywinrm
+     
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
