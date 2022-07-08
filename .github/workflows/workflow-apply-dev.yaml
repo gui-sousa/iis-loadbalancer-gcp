@@ -64,7 +64,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pywinrm
+        pip install https://github.com/diyan/pywinrm/archive/master.zip#egg=pywinrm
      
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
