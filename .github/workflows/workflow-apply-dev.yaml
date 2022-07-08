@@ -66,7 +66,7 @@ jobs:
       run: |
         pip install ansible
         pip install --ignore-installed pywinrm
-        ansible-playbook -i hosts.ini playbook.yml -vvv"
+        ansible-playbook -i hosts.ini playbook.yml -vvv
 
   #  - name: Run playbook
   #    uses: dawidd6/action-ansible-playbook@v2
