@@ -58,13 +58,7 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
     - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-
-    - name: Install dependencies
-      run: |
-        pip install https://github.com/diyan/pywinrm/archive/master.zip#egg=pywinrm
+      run: pip install https://github.com/diyan/pywinrm/archive/master.zip#egg=pywinrm
      
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
