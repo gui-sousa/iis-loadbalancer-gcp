@@ -57,20 +57,23 @@ jobs:
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
-    - name: Set up Python 3.7
-      run: pip install --ignore-installed pywinrm
-     
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
        time: '130s'
 
-    - name: Run playbook
-      uses: dawidd6/action-ansible-playbook@v2
-      with:
-       playbook: ./playbook.yml
-       options: |
-        --inventory hosts.ini
+    - name: Set up Python 3.7
+      run: |
+        pip install ansible
+        pip install --ignore-installed pywinrm
+        ansible-playbook -i hosts.ini playbook.yml -vvv"
+
+  #  - name: Run playbook
+  #    uses: dawidd6/action-ansible-playbook@v2
+  #    with:
+  #     playbook: ./playbook.yml
+  #     options: |
+  #      --inventory hosts.ini
   
     - name: Terraform destroy
       run: terraform destroy -var-file=ambientes/dev/vars-dev.tfvars -auto-approve
