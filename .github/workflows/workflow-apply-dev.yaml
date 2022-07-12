@@ -82,7 +82,7 @@ jobs:
         credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_DEV }}
 
     - name: 'Use gcloud CLI'
-      run: 'gcloud compute images delete windows-server-winrm-local --quiet'
+      run: 'gcloud compute images delete windows-server-winrm-dev --quiet'
 
 #  golang:
 #    name: 'Teste'
