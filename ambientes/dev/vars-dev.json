@@ -1,6 +1,7 @@
 {
 
     "chave" : "{{ env `GOOGLE_CREDENTIALS_DEV` }}",
-    "projeto" : "develop-348618"
+    "projeto" : "develop-348618",
+    "imagem" : "windows-server-winrm-dev"
 
 }
