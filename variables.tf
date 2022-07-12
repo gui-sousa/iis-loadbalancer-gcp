@@ -24,6 +24,9 @@ variable "ip-sql2" {
   default = "10.4.0.2"
 }
 
+variable "imagem" {
+}
+
 /*variable "server" {
   type = map(object({
     name         = string
