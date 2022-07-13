@@ -1,6 +1,6 @@
 {
 
-    "chave" : "/home/guisousa/bwg-work/iis-loadbalancer-gcp/ambientes/prod/gcp-prod.json",
+    "chave" : "{{ env `PKR_GOOGLE_CREDENTIALS_DEV` }}",
     "projeto" : "prod-348618",
     "imagem" : "windows-server-winrm-prod"
 
