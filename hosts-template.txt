@@ -1,0 +1,14 @@
+[win]
+${ip_instancia}
+
+[win:vars]
+ansible_user=adfs
+ansible_password="P@ssw0rd"
+ansible_port=5986
+ansible_connection=winrm
+; ansible_winrm_operation_timeout_sec=60
+; ansible_winrm_read_timeout_sec=70
+; ansible_winrm_scheme=http
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true

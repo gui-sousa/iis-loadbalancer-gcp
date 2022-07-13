@@ -1,0 +1,34 @@
+{
+    "builders": [
+      {
+        "type": "googlecompute",
+        "account_file": "{{user `chave`}}",
+        "project_id": "{{user `projeto`}}",
+        "instance_name": "homolog-windows-server-dev",
+        "image_name": "{{user `imagem`}}",
+        "source_image": "windows-server-2019-dc-v20220314",
+        "disk_size": "50",
+        "machine_type": "n1-highcpu-2",
+        "communicator": "winrm",
+        "winrm_username": "packer_user",
+        "winrm_insecure": true,
+        "winrm_use_ssl": true,
+        "metadata": {
+          "windows-startup-script-cmd": "winrm quickconfig -quiet & net user /add packer_user & net localgroup administrators packer_user /add & winrm set winrm/config/service/auth @{Basic=\"true\"}"
+        },
+        "zone": "us-east1-b"
+      }
+    ],
+
+    
+    "provisioners": [
+     {
+      "type": "powershell",
+      "scripts": [
+          "./packer/config-user-adm.ps1",
+          "./packer/config-winrm-ansible.ps1"
+      ]
+     }
+  ]
+
+} 
