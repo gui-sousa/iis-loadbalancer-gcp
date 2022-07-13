@@ -1,0 +1,13 @@
+iis-lb.txt
+tf-gcp-dev.json
+tf-gcp-prod.json
+gcp-dev-packer.json
+pkr-gcp-dev.json
+pkr-gcp-prod.json
+gcp-dev-packer.json
+**/.terraform/*
+*.tfstate.lock.info
+crash.log
+crash.*.log
+.terraform.lock.hcl
+*.json:Zone.Identifier
