@@ -1,4 +1,4 @@
-name: 'Terraform Apply - Produção'
+name: 'Pipe - Produção'
 
 on:
   push:
@@ -6,10 +6,30 @@ on:
     - master
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  packer:
+    name: Build
     runs-on: ubuntu-latest
+    steps:
+      - name: Checa codigo fonte
+        uses: "actions/checkout@v3"
 
+      - name: Configura autenticação no GCP
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: ${{ secrets.PKR_GOOGLE_CREDENTIALS_PROD }}
+
+      - name: Packer Build
+        uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
+        with:
+          main_file: ./packer/pkr-ad-imagem.json
+          variable_file: ./ambientes/prod/vars-prod.json
+          working_directory: .
+  
+  terraform:
+    name: 'Deploy'
+    runs-on: ubuntu-latest
+    needs: packer
+  
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -18,7 +38,6 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       env:
         terraform_version: 0.15.5
-
 
     - name: Terraform Init
       run: terraform init -backend=true -backend-config="ambientes/prod/backend.tf"
@@ -37,3 +56,41 @@ jobs:
       run: terraform apply "iis-lb.txt"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}
+
+    - name: Aguardando WINRM ficar disponivel
+      uses: jakejarvis/wait-action@master
+      with:
+       time: '130s'
+
+    - name: Executa Ansible-Plabook
+      run: |
+        pip install ansible
+        pip install --ignore-installed pywinrm
+        ansible-playbook -i hosts.ini playbook.yml -vvv
+  
+    - name: Terraform destroy
+      run: terraform destroy -var-file=ambientes/prod/vars-prod.tfvars -auto-approve
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}
+
+    - name: 'Instalando Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: Configurando autenticação no GCP
+      uses: "google-github-actions/auth@v0"
+      with:
+        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}
+
+    - name: 'Exluindo Imagem AD'
+      run: 'gcloud compute images delete windows-server-winrm-prod --quiet'
+
+#  golang:
+#    name: 'Teste'
+#
+#    - name: GoLang
+#      uses: actions/setup-go@v3
+#      with:
+#        go-version: '1.16.1'
+#
+#    - name: 'Teste'
+#      run: go run monitora.gos
