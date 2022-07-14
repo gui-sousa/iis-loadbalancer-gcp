@@ -1,6 +1,6 @@
 {
 
-    "chave" : "{{ env `PKR_GOOGLE_CREDENTIALS_DEV` }}",
+    "chave" : "{{ env `PKR_GOOGLE_CREDENTIALS_PROD` }}",
     "projeto" : "prod-348618",
     "imagem" : "windows-server-winrm-prod"
 
