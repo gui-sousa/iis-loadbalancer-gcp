@@ -5,6 +5,7 @@ gcp-dev-packer.json
 pkr-gcp-dev.json
 pkr-gcp-prod.json
 gcp-dev-packer.json
+anotações.md
 **/.terraform/*
 *.tfstate.lock.info
 crash.log

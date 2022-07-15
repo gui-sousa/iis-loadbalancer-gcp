@@ -1,6 +1,6 @@
 ---
 - name: Cria Ambiente Active Directory e ADFS
-  hosts: win
+  hosts: ad
   vars:
     temp_address: ${ip_instancia}
     dc_address: ${ip_instancia}

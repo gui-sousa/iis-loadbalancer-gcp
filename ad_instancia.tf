@@ -4,7 +4,7 @@ resource "google_compute_instance" "instancia-ad" {
   zone         = var.zona
   boot_disk {
     initialize_params {
-      image = var.imagem
+      image = var.imagem-ad
     }
   }
 

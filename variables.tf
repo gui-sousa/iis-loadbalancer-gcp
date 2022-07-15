@@ -5,8 +5,8 @@ variable "regiao" {
 variable "projeto" {
 }
 
-#variable "credenciais" {
-#}
+variable "credenciais" {
+}
 
 variable "tipo-vm" {
   default = "n1-standard-2"
@@ -24,8 +24,12 @@ variable "ip-sql2" {
   default = "10.4.0.2"
 }
 
-variable "imagem" {
+variable "imagem-ad" {
 }
+
+variable "imagem-core" {
+}
+
 
 /*variable "server" {
   type = map(object({

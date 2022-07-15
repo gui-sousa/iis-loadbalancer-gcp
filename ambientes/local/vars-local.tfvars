@@ -1,4 +1,5 @@
 projeto = "develop-348618"
-imagem = "windows-server-winrm-local"
-credenciais = "/home/guisousa/bwg-work/iis-loadbalancer-gcp/ambientes/local/gcp-dev.json"
+imagem-ad = "windows-server-winrm-local-ad"
+imagem-core = "windows-server-winrm-local-core"
+credenciais = "/home/guisousa/bwg-work/iis-loadbalancer-gcp/ambientes/local/tf-gcp-dev.json"
 

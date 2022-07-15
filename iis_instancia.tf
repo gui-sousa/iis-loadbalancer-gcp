@@ -4,7 +4,9 @@ resource "google_compute_instance" "instancia-iis" {
   zone         = var.zona
   boot_disk {
     initialize_params {
-      image = "windows-server-20h2-dc-core-v20220414"
+      image = var.imagem-core
+      
+      #"windows-server-20h2-dc-core-v20220414"
     }
   }
 

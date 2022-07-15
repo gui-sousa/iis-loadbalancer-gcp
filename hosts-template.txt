@@ -1,8 +1,8 @@
-[win]
+[ad]
 ${ip_instancia}
 
-[win:vars]
-ansible_user=adfs
+[ad:vars]
+ansible_user=user
 ansible_password="P@ssw0rd"
 ansible_port=5986
 ansible_connection=winrm

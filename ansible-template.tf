@@ -6,7 +6,7 @@ data "template_file" "host-ansible" {
 }
 
 data "template_file" "playbook-ansible" {
-  template = file("./playbook-template.yml")
+  template = file("./playbooks/playbook-ad-template.yml")
   vars = {
     "ip_instancia" = google_compute_instance.instancia-ad.network_interface.0.access_config.0.nat_ip
   }

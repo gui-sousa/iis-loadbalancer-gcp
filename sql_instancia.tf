@@ -4,7 +4,9 @@ resource "google_compute_instance" "instancia-sql-1" {
   zone         = var.zona
   boot_disk {
     initialize_params {
-      image = "windows-sql-cloud/sql-2019-standard-windows-2022-dc-v20220418"
+      image = var.imagem-core
+      
+      #"windows-sql-cloud/sql-2019-standard-windows-2022-dc-v20220418"
     }
   }
 
