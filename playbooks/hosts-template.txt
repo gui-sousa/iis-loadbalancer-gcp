@@ -1,0 +1,59 @@
+[ad]
+${ip_instancia_ad}
+
+[ad:vars]
+ansible_user=user
+ansible_password="P@ssw0rd"
+ansible_port=5986
+ansible_connection=winrm
+; ansible_winrm_operation_timeout_sec=60
+; ansible_winrm_read_timeout_sec=70
+; ansible_winrm_scheme=http
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true
+
+[iis]
+${ip_instancia_iis}
+
+[iis:vars]
+ansible_user=user
+ansible_password="P@ssw0rd"
+ansible_port=5986
+ansible_connection=winrm
+; ansible_winrm_operation_timeout_sec=60
+; ansible_winrm_read_timeout_sec=70
+; ansible_winrm_scheme=http
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true
+
+[sql1]
+${ip_instancia_sql1}
+
+[sql1:vars]
+ansible_user=user
+ansible_password="P@ssw0rd"
+ansible_port=5986
+ansible_connection=winrm
+; ansible_winrm_operation_timeout_sec=60
+; ansible_winrm_read_timeout_sec=70
+; ansible_winrm_scheme=http
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true
+
+[sql2]
+${ip_instancia_sql2}
+
+[sql2:vars]
+ansible_user=user
+ansible_password="P@ssw0rd"
+ansible_port=5986
+ansible_connection=winrm
+; ansible_winrm_operation_timeout_sec=60
+; ansible_winrm_read_timeout_sec=70
+; ansible_winrm_scheme=http
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_kerberos_delegation=true

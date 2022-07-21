@@ -1,0 +1,20 @@
+---
+- name: Configura Ambiente IIS
+  hosts: iss
+  #vars:
+    
+  tasks:
+  - name:
+    win_domain_membership:
+      dns_domain_name: example-gcp.local
+      hostname: bookshelf-iis
+      domain_admin_user: user@example-gcp.local
+      domain_admin_password: P@ssw0rd
+      #domain_ou_path: "OU=Windows,OU=Servers,DC=ansible,DC=vagrant"
+      state: domain
+    register: domain_state
+
+  - ansible.windows.win_reboot:
+    when: domain_state.reboot_required
+ 
+

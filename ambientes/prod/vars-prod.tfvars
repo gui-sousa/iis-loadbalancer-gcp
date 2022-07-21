@@ -1,2 +1,2 @@
-projeto = "prod-348618"
+projeto = "prod-356920"
 imagem = "windows-server-winrm-prod"
