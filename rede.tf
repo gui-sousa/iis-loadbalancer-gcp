@@ -32,5 +32,10 @@ resource "google_compute_firewall" "tcp-rule" {
     protocol = "tcp"
     ports    = ["0-65535"]
   }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["5985", "5986"]
+  }
   source_ranges = ["10.4.0.0/24", "10.3.0.0/24"]
 }

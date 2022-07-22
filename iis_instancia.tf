@@ -12,8 +12,9 @@ resource "google_compute_instance" "instancia-iis" {
 
   #Define Configuração de Rede
   network_interface {
-    subnetwork = google_compute_subnetwork.sql1.name
-    network_ip = "10.3.0.9"
+    network = "default"
+    #subnetwork = google_compute_subnetwork.sql1.name
+    #network_ip = "10.3.0.9"
     access_config {}
   }
 

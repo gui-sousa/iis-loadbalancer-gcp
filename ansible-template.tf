@@ -11,7 +11,8 @@ data "template_file" "host-ansible" {
 data "template_file" "playbook-ansible" {
   template = file("./playbooks/playbook-ad-template.yml")
   vars = {
-    "ip_instancia_ad" = google_compute_instance.instancia-ad.network_interface.0.access_config.0.nat_ip
+    "ip_instancia_ad"         = google_compute_instance.instancia-ad.network_interface.0.access_config.0.nat_ip
+    "ip_instancia_interno_ad" = google_compute_instance.instancia-ad.network_interface.0.network_ip
   }
 
 
