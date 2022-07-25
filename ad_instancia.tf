@@ -10,7 +10,8 @@ resource "google_compute_instance" "instancia-ad" {
 
   #Define Configuração de Rede
   network_interface {
-    network = "default"
+    subnetwork = google_compute_subnetwork.ad1.name
+    network_ip = "10.1.0.100"
     access_config {}
   }
 
