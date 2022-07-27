@@ -134,22 +134,25 @@
     - { nome: 'teste2', grupo: 'Domain Users' }
 
 
-- name: Ingressa Dominio
-  hosts: iis
+- name: Ingressa Servidores no Dominio
+  hosts: iis:sql1:sql2
   tasks:
     - name: "Colocando DNS do AD na instancia"
       ansible.windows.win_dns_client:
         adapter_names: Ethernet
         dns_servers: ${ip_instancia_interno_ad}
 
-    - name: Change the hostname to new_hostname
+- name: Configuração servidor IIS
+  hosts: iis
+  tasks:
+    - name: "Alterando hostname e reiniciando"
       win_hostname:
         name: bookshelf-iis
-      register: nome
+      register: iis
     - win_reboot:
-      when: nome.reboot_required
-
-    - name: "Ingressando ao dominio"
+      when: iis.reboot_required
+    
+    - name: "Adicionando Servers ao dominio e reiniciando"
       win_domain_membership:
         dns_domain_name: example-gcp.local
         domain_admin_user: spirogiro@example-gcp.local
@@ -157,4 +160,48 @@
         state: domain
       register: domain_state
     - win_reboot:
+        pre_reboot_delay: 100
       when: domain_state.reboot_required
+
+- name: Configurando servidor SQL1
+  hosts: sql1
+  tasks:
+    - name: "Alterando hostname e reiniciando"
+      win_hostname:
+        name: bookshelf-sql1
+      register: sql1
+    - win_reboot:
+      when: sql1.reboot_required
+
+    - name: "Adicionando Servers ao dominio e reiniciando"
+      win_domain_membership:
+        dns_domain_name: example-gcp.local
+        domain_admin_user: spirogiro@example-gcp.local
+        domain_admin_password: P@ssw0rd
+        state: domain
+      register: domain_state
+    - win_reboot:
+        pre_reboot_delay: 100
+      when: domain_state.reboot_required
+
+- name: Configurando servidor SQL2
+  hosts: sql2
+  tasks:
+    - name: "Alterando hostname e reiniciando"
+      win_hostname:
+        name: bookshelf-sql2
+      register: sql2
+    - win_reboot:
+      when: sql2.reboot_required
+
+    - name: "Adicionando Servers ao dominio e reiniciando"
+      win_domain_membership:
+        dns_domain_name: example-gcp.local
+        domain_admin_user: spirogiro@example-gcp.local
+        domain_admin_password: P@ssw0rd
+        state: domain
+      register: domain_state
+    - win_reboot:
+        pre_reboot_delay: 100
+      when: domain_state.reboot_required
+  
