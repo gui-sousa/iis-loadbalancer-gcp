@@ -25,17 +25,10 @@ jobs:
           variable_file: ./ambientes/dev/vars-dev.json
           working_directory: .
 
-      - name: Packer Build - IIS
+      - name: Packer Build - Windows Core
         uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
         with:
-          main_file: ./packer/pkr-iis-imagem.json
-          variable_file: ./ambientes/dev/vars-dev.json
-          working_directory: .
-
-      - name: Packer Build - SQL
-        uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
-        with:
-          main_file: ./packer/pkr-sql-imagem.json
+          main_file: ./packer/pkr-wcore-imagem.json
           variable_file: ./ambientes/dev/vars-dev.json
           working_directory: .
   

@@ -18,13 +18,20 @@ jobs:
         with:
           credentials_json: ${{ secrets.PKR_GOOGLE_CREDENTIALS_PROD }}
 
-      - name: Packer Build
+      - name: Packer Build - AD
         uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
         with:
           main_file: ./packer/pkr-ad-imagem.json
-          variable_file: ./ambientes/prod/vars-prod.json
+          variable_file: ./ambientes/dev/vars-dev.json
           working_directory: .
-  
+
+      - name: Packer Build - Windows Core
+        uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
+        with:
+          main_file: ./packer/pkr-wcore-imagem.json
+          variable_file: ./ambientes/dev/vars-dev.json
+          working_directory: .
+          
   terraform:
     name: 'Deploy'
     runs-on: ubuntu-latest
