@@ -50,7 +50,7 @@ resource "google_compute_firewall" "tcp-rule" {
 resource "google_compute_firewall" "winrm" {
   name    = "iis-winrm-rule"
   network = google_compute_network.sql.id
-  
+
   allow {
     protocol = "tcp"
     ports    = ["5985", "5986"]
@@ -58,7 +58,7 @@ resource "google_compute_firewall" "winrm" {
 
   allow {
     protocol = "tcp"
-    ports = ["3389"]
+    ports    = ["3389"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
