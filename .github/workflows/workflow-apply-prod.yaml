@@ -73,7 +73,9 @@ jobs:
       run: |
         pip install ansible
         pip install --ignore-installed pywinrm
-        ansible-playbook -i hosts.ini playbook.yml -vvv
+        ansible-playbook -i hosts.ini playbook-ad.yml -vvv 
+        ansible-playbook -i hosts.ini playbook-iis.yml -vvv 
+        ansible-playbook -i hosts.ini playbook-sql.yml -vvv 
   
     - name: Terraform destroy
       run: terraform destroy -var-file=ambientes/prod/vars-prod.tfvars -auto-approve

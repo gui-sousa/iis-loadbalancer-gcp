@@ -6,6 +6,7 @@ pkr-gcp-dev.json
 pkr-gcp-prod.json
 gcp-dev-packer.json
 anotações.md
+ansible-exec.tf
 **/.terraform/*
 *.tfstate.lock.info
 crash.log
