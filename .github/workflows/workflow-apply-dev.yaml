@@ -72,6 +72,7 @@ jobs:
     - name: Executa Ansible-Plabook
       run: |
         pip install ansible
+        pip install pywinrm
         pip install --ignore-installed pywinrm
         ansible-playbook -i hosts.ini playbook.yml -vvv
   
