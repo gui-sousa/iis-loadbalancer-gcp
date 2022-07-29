@@ -91,7 +91,10 @@ jobs:
         credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_PROD }}
 
     - name: 'Exluindo Imagem AD'
-      run: 'gcloud compute images delete windows-server-winrm-prod --quiet'
+      run: 'gcloud compute images delete windows-server-winrm-prod-ad --quiet'
+
+    - name: 'Excluindo Imagem Core'
+      run: 'gcloud compute images delete windows-server-winrm-prod-core --quiet'
 
 #  golang:
 #    name: 'Teste'
