@@ -1,7 +1,7 @@
 {
 
-    "chave" : "/home/guisousa/bwg-work/iis-loadbalancer-gcp/ambientes/local/develop_2.json",
-    "projeto" : "develop-348618",
+    "chave" : "/home/guisousa/bwg-work/iis-loadbalancer-gcp/ambientes/local/pkr-gcp-dev.json",
+    "projeto" : "develop-356920",
     "imagem" : "windows-server-winrm-local"
 
 }

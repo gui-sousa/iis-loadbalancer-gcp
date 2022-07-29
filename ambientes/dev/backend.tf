@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
-    bucket      = "bkt-iis-loadbalancer-dev"
+    bucket      = "bkt-iis-loadbalancer-dev-2"
     prefix      = "dev"
-    credentials = file("gcp-dev.json")
+    credentials = file("tf-gcp-dev.json")
   }
 }

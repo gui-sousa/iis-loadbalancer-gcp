@@ -24,8 +24,12 @@ variable "ip-sql2" {
   default = "10.4.0.2"
 }
 
-variable "imagem" {
+variable "imagem-ad" {
 }
+
+variable "imagem-core" {
+}
+
 
 /*variable "server" {
   type = map(object({

@@ -1,12 +1,12 @@
 ---
-- name: Cria Ambiente Active Directory e ADFS
-  hosts: win
+- name: Cria Ambiente Active Directory com Dominio
+  hosts: ad
   vars:
-    temp_address: ${ip_instancia}
-    dc_address: ${ip_instancia}
+    temp_address: ${ip_instancia_ad}
+    dc_address: ${ip_instancia_ad}
     dc_netmask_cidr: 24
-    dc_gateway: ${ip_instancia}
-    dc_hostname: 'adfs'
+    dc_gateway: ${ip_instancia_ad}
+    dc_hostname: 'bookshelf-ad'
     domain_name: "example-gcp.local"
     local_admin: '.\administrator'
     temp_password: 'P@ssw0rd'
@@ -132,4 +132,3 @@
     - { nome: 'spyrojaira', grupo: 'Domain Admins' }
     - { nome: 'teste1', grupo: 'Domain Users' }
     - { nome: 'teste2', grupo: 'Domain Users' }
-

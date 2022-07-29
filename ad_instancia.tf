@@ -4,13 +4,14 @@ resource "google_compute_instance" "instancia-ad" {
   zone         = var.zona
   boot_disk {
     initialize_params {
-      image = var.imagem
+      image = var.imagem-ad
     }
   }
 
   #Define Configuração de Rede
   network_interface {
-    network = "default"
+    subnetwork = google_compute_subnetwork.ad1.name
+    network_ip = "10.1.0.100"
     access_config {}
   }
 
