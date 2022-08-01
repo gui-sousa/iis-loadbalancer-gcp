@@ -5,8 +5,8 @@ variable "regiao" {
 variable "projeto" {
 }
 
-#variable "credenciais" {
-#}
+variable "credenciais" {
+}
 
 variable "tipo-vm" {
   default = "n1-standard-2"

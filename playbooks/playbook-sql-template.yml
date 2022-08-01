@@ -37,4 +37,19 @@
     - win_reboot:
         pre_reboot_delay: 100
       when: domain_state.reboot_required
+
+    - name: Adiciona regras de firewall do Windows
+      ansible.windows.win_powershell:
+        script: |
+          netsh advfirewall firewall add rule name="5022 for Avail Groups" dir=in action=allow protocol=TCP localport=5022
+          netsh advfirewall firewall add rule name="1433 for SQL Server" dir=in action=allow protocol=TCP localport=1433
+
+    - name: Instala o recurso de cluster de failover
+      ansible.windows.win_powershell:
+        script: |
+          Install-WindowsFeature Failover-Clustering -IncludeManagementTools
+    
+    - name: Reinicia Instancias
+      ansible.windows.win_reboot:
+        pre_reboot_delay: 100
  
