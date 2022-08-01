@@ -22,14 +22,14 @@ jobs:
         uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
         with:
           main_file: ./packer/pkr-ad-imagem.json
-          variable_file: ./ambientes/dev/vars-dev.json
+          variable_file: ./ambientes/prod/vars-prod.json
           working_directory: .
 
       - name: Packer Build - Windows Core
         uses: "rastogiji/gcp-packer-github-actions@v1.0.1"
         with:
           main_file: ./packer/pkr-wcore-imagem.json
-          variable_file: ./ambientes/dev/vars-dev.json
+          variable_file: ./ambientes/prod/vars-prod.json
           working_directory: .
           
   terraform:
