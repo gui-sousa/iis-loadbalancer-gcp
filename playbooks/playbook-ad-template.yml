@@ -19,6 +19,11 @@
   gather_facts: no
   
   tasks:
+  - name: Aguardando Instancia ficar disponivel
+    wait_for_connection:
+      timeout: 900
+    delegate_to: '{{ dc_address }}'
+
   - name: Config IP Estatico
     win_shell: "(new-netipaddress -InterfaceAlias Ethernet0 -IPAddress {{ dc_address }} -prefixlength {{dc_netmask_cidr}} -defaultgateway {{ dc_gateway }})"
     delegate_to: '{{ temp_address }}'  
@@ -130,5 +135,5 @@
     loop:
     - { nome: 'spirogiro', grupo: 'Domain Admins' }
     - { nome: 'spyrojaira', grupo: 'Domain Admins' }
-    - { nome: 'teste1', grupo: 'Domain Users' }
+    - { nome: 'sql.service', grupo: 'Domain Users' }
     - { nome: 'teste2', grupo: 'Domain Users' }

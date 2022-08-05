@@ -1,5 +1,5 @@
 ---
-- name: Configura hostname SQL1
+- name: Configuração SQL1
   hosts: sql1
   tasks:
     - name: "Alterando hostname e reiniciando"
@@ -9,7 +9,7 @@
     - win_reboot:
       when: iis.reboot_required 
 
-- name: Configura hostname SQL2
+- name: Configuração SQL2
   hosts: sql2
   tasks:
     - name: "Alterando hostname e reiniciando"
@@ -25,11 +25,7 @@
           New-Item -ItemType directory -Path C:\SQLBackup
           New-SMBShare -Name SQLBackup -Path C:\SQLBackup -FullAccess "Authenticated Users"
 
-#    - name: Reinicia SQL2 para concluir instalações
-#      ansible.windows.win_reboot:
-#        pre_reboot_delay: 100
-
-- name: Configura ambiente SQL
+- name: Configuraçao Rede e instalações
   hosts: sql1:sql2
   tasks:
     - name: "Colocando DNS do dominio na instancia"
@@ -40,13 +36,16 @@
     - name: Adiciona regras de firewall do Windows
       ansible.windows.win_powershell:
         script: |
+          netsh firewall set service remoteadmin
           netsh advfirewall firewall add rule name="5022 for Avail Groups" dir=in action=allow protocol=TCP localport=5022
           netsh advfirewall firewall add rule name="1433 for SQL Server" dir=in action=allow protocol=TCP localport=1433
 
     - name: Instala o recurso de cluster de failover
-      ansible.windows.win_powershell:
-        script: |
-          Install-WindowsFeature Failover-Clustering -IncludeManagementTools
+      win_feature: 
+       name: "Failover-Clustering"
+       state: present
+       include_sub_features: true
+       include_management_tools: true
 
     - name: Cria as pastas para os dados e arquivos de registro do SQL Server
       ansible.windows.win_powershell:
@@ -66,7 +65,7 @@
       when: domain_state.reboot_required
 
 
-- name: Configura Cluster SQL1
+- name: Certifica que a instância do SQL1 esta pronta
   hosts: sql1
   tasks:
     - name: Ingressando SQL1 ao Cluster
@@ -74,14 +73,15 @@
         script: |
           $node1 = "bookshelf-sql1"
           $node2 = "bookshelf-sql2"
-
+          
           $nameWSFC = "bookshelf-dbclus"
-
+          
           $ipWSFC1 = "10.3.0.4"
           $ipWSFC2 = "10.4.0.4"
+          
           $ipWSListener1 = "10.3.0.5"
           $ipWSListener2 = "10.4.0.5"
-
+          
           $SQLServer1IsReady=$False
           For ($i=0; $i -le 30; $i++) {
               $SqlCatalog = "master"
@@ -104,7 +104,320 @@
               Write-Error "$node1 is not responding. Was it deployed correctly?"
           }
     
+- name: Certifica que a instância do SQL2 esta pronta
+  hosts: sql2
+  tasks:
+    - name: Ingressando SQL2 ao Cluster
+      ansible.windows.win_powershell:
+        script: |
+          $node1 = "bookshelf-sql1"
+          $node2 = "bookshelf-sql2"
 
+          $SQLServer2IsReady=$False
+          For ($i=0; $i -le 30; $i++) {
+              $SqlCatalog = "master"
+              $SqlConnection = New-Object System.Data.SqlClient.SqlConnection
+              $SqlConnection.ConnectionString = "Server = $node2;" + `
+                    "Database = $SqlCatalog; Integrated Security = True"
+              try {
+                  $SqlConnection.Open()
+                  Write-Host "Connection to the server $node2 was successful"
+                  $SQLServer2IsReady=$True
+                  $SqlConnection.Close()
+                  break
+              }
+              catch {
+                  Write-Host "SQL server $node2 is not ready, waiting for 60s"
+                  Start-Sleep -s 60 #Wait for 60 seconds
+              }
+          }
+          if($SQLServer2IsReady -eq $False) {
+              Write-Error "$node2 is not responding. Was it deployed correctly?"
+          }
     
+- name: Criando o Cluster
+  hosts: sql1
+  tasks:
+    - name: Criando o Cluster
+      ansible.windows.win_powershell:
+        script: |
+          $node1 = "bookshelf-sql1"
+          $node2 = "bookshelf-sql2"
+          
+          $nameWSFC = "bookshelf-dbclus"
+          
+          $ipWSFC1 = "10.3.0.4"
+          $ipWSFC2 = "10.4.0.4"
 
- 
+          New-Cluster -Name $nameWSFC -Node $node1, $node2 -NoStorage `
+              -StaticAddress $ipWSFC1, $ipWSFC2
+
+    - name: Ativa o recurso de grupos de disponibilidade
+      ansible.windows.win_powershell:
+        script: |
+          Enable-SqlAlwaysOn -ServerInstance $node1 -Force
+          Enable-SqlAlwaysOn -ServerInstance $node2 -Force
+
+- name: Configurando o Banco de Dados
+  hosts: sql1
+  tasks:
+    - name: Criando o Banco de Dados
+      ansible.windows.win_powershell:
+        script: |
+          $node1 = "bookshelf-sql1"
+
+          $CreateDatabaseSQLScript =  @"
+          CREATE DATABASE bookshelf ON PRIMARY
+              (NAME = 'bookshelf_Data', FILENAME='C:\SQLData\bookshelf_data.mdf', SIZE =
+          256MB, MAXSIZE = UNLIMITED, FILEGROWTH = 256MB )
+              LOG ON (NAME = 'bookshelf_log', FILENAME='C:\SQLLog\bookshelf_log.ldf',
+          SIZE = 256MB, MAXSIZE = UNLIMITED, FILEGROWTH = 256MB )
+          GO
+          USE [bookshelf]
+          Exec dbo.sp_changedbowner @loginame = 'sa', @map = false;
+          ALTER DATABASE [bookshelf] SET RECOVERY FULL;
+          GO
+          BACKUP DATABASE bookshelf to disk =
+          '\\bookshelf-sql2\SQLBackup\bookshelf.bak' WITH INIT
+          GO
+          "@
+          Invoke-Sqlcmd -Query $CreateDatabaseSQLScript -ServerInstance $node1
+
+    - name: Criando Tabela Books
+      ansible.windows.win_powershell:
+        script: |
+          $node1 = "bookshelf-sql1"
+          
+          $CreateTableSQLScript =  @"
+          USE [bookshelf]
+          GO
+          SET ANSI_NULLS ON
+          GO
+          SET QUOTED_IDENTIFIER ON
+          GO
+          CREATE TABLE [dbo].[Books] (
+                      [Id] [bigint] IDENTITY(1,1) NOT NULL,
+                      [Title] [nvarchar](max) NOT NULL,
+                      [Author] [nvarchar](max) NULL,
+                      [PublishedDate] [datetime] NULL,
+                      [ImageUrl] [nvarchar](max) NULL,
+                      [Description] [nvarchar](max) NULL,
+                      [CreatedById] [nvarchar](max) NULL,
+          CONSTRAINT [PK_dbo.Books] PRIMARY KEY CLUSTERED
+              ([Id] ASC) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF,
+          IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+          ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+          GO
+          "@
+          Invoke-Sqlcmd -Query $CreateTableSQLScript -ServerInstance $node1
+
+    - name: Criando Tabela Books
+      ansible.windows.win_powershell:
+        script: |
+          $Domain = "example-gcp.local"
+          $ADControllerFQDN = "bookshelf-ad.$Domain"
+          $ServiceAccountName = "sql.service"
+          $ServiceAccountPrincipalName = "$ServiceAccountName@$Domain"
+          $node1 = "bookshelf-sql1"
+
+          $AddSQLServiceAccountScript =  @"
+          USE [master]
+          GO
+              CREATE LOGIN [EXAMPLE-GCP\sql.service] FROM WINDOWS WITH
+          DEFAULT_DATABASE=[bookshelf], DEFAULT_LANGUAGE=[us_english]
+          GO
+          USE [bookshelf]
+          GO
+          CREATE USER [EXAMPLE-GCP\sql.service] FOR LOGIN [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_accessadmin] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_backupoperator] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_datareader] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_datawriter] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_ddladmin] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_owner] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          USE [bookshelf]
+          GO
+          ALTER ROLE [db_securityadmin] ADD MEMBER [EXAMPLE-GCP\sql.service]
+          GO
+          "@
+          Invoke-Sqlcmd -Query $AddSQLServiceAccountScript -ServerInstance $node1
+
+    - name: Realizando Backup entre as replicas
+      ansible.windows.win_powershell:
+        script: |
+          $Database="bookshelf"
+          $BackupFolder="SQLBackup"
+          $node1 = "bookshelf-sql1"
+          $node2 = "bookshelf-sql2"
+          $SharedLocation="\\$node2\$BackupFolder"
+          $ListenerName="sql-listener"
+          $AGName="MainAG"
+          $PrimaryServer = "$node1.$Domain\MSSQLSERVER"
+          $SecondaryServer = "$node2.$Domain\MSSQLSERVER"
+
+          Backup-SqlDatabase `
+              -Database $Database -Initialize `
+              -BackupFile "$SharedLocation\$Database.bak" `
+              -ServerInstance $node1
+
+          Restore-SqlDatabase `
+              -Database $Database `
+              -BackupFile "$SharedLocation\$Database.bak" `
+              -ServerInstance $node2 `
+              -NORECOVERY
+
+          Backup-SqlDatabase `
+              -Database $Database -Initialize `
+              -BackupFile "$SharedLocation\$Database.log" `
+              -ServerInstance $node1 `
+              -BackupAction Log
+
+          Restore-SqlDatabase `
+              -Database $Database `
+              -BackupFile "$SharedLocation\$Database.log" `
+              -ServerInstance $node2 `
+              -RestoreAction Log `
+              -NORECOVERY
+
+    - name: Permissões para DCOM/RL/RA
+      ansible.windows.win_powershell:
+        script: |
+          $Principal = "example-gcp.local\sql.service"
+          $Computers = "bookshelf-sql2"
+
+          function get-sid
+          {
+          PARAM ($DSIdentity)
+          $ID = new-object System.Security.Principal.NTAccount($DSIdentity)
+          return $ID.Translate( [System.Security.Principal.SecurityIdentifier] ).toString()
+          }
+
+          $sid = get-sid $Principal
+
+          #DefaultLaunchPermission - Local Launch, Remote Launch, Local Activation, Remote Activation
+          $DCOMSDDLDefaultLaunchPermission = "A;;CCDCLCSWRP;;;$sid"
+
+          #DefaultAccessPermision - Local Access, Remote Access
+          $DCOMSDDLDefaultAccessPermision = "A;;CCDCLC;;;$sid"
+
+          #PartialMatch
+          $DCOMSDDLPartialMatch = "A;;\w+;;;$sid"
+
+          foreach ($strcomputer in $computers)
+          {
+          write-host "`nWorking on $strcomputer with principal $Principal ($sid):"
+          # Get the respective binary values of the DCOM registry entries
+          $Reg = [WMIClass]"\\$strcomputer\root\default:StdRegProv"
+          $DCOMDefaultLaunchPermission = $Reg.GetBinaryValue(2147483650,"software\microsoft\ole","DefaultLaunchPermission").uValue
+          $DCOMDefaultAccessPermission = $Reg.GetBinaryValue(2147483650,"software\microsoft\ole","DefaultAccessPermission").uValue
+
+          # Convert the current permissions to SDDL
+          write-host "`tConverting current permissions to SDDL format..."
+          $converter = new-object system.management.ManagementClass Win32_SecurityDescriptorHelper
+          $CurrentDCOMSDDLDefaultLaunchPermission = $converter.BinarySDToSDDL($DCOMDefaultLaunchPermission)
+          $CurrentDCOMSDDLDefaultAccessPermission = $converter.BinarySDToSDDL($DCOMDefaultAccessPermission)
+
+          # Build the new permissions
+          if (($CurrentDCOMSDDLDefaultLaunchPermission.SDDL -match $DCOMSDDLPartialMatch) -and ($CurrentDCOMSDDLDefaultLaunchPermission.SDDL -notmatch $DCOMSDDLDefaultLaunchPermission))
+          {
+            $NewDCOMSDDLDefaultLaunchPermission = $CurrentDCOMSDDLDefaultLaunchPermission.SDDL -replace $DCOMSDDLPartialMatch, $DCOMSDDLDefaultLaunchPermission
+          }
+          else
+          {
+            $NewDCOMSDDLDefaultLaunchPermission = $CurrentDCOMSDDLDefaultLaunchPermission.SDDL + "(" + $DCOMSDDLDefaultLaunchPermission + ")"
+          }
+
+          if (($CurrentDCOMSDDLDefaultAccessPermission.SDDL -match $DCOMSDDLPartialMatch) -and ($CurrentDCOMSDDLDefaultAccessPermission.SDDL -notmatch $DCOMSDDLDefaultAccessPermision))
+          {
+            $NewDCOMSDDLDefaultAccessPermission = $CurrentDCOMSDDLDefaultAccessPermission.SDDL -replace $DCOMSDDLPartialMatch, $DCOMSDDLDefaultAccessPermision
+          }
+          else
+          {
+            $NewDCOMSDDLDefaultAccessPermission = $CurrentDCOMSDDLDefaultAccessPermission.SDDL + "(" + $DCOMSDDLDefaultAccessPermision + ")"
+          }
+
+          # Convert SDDL back to Binary
+          write-host "`tConverting SDDL back into binary form..."
+          $DCOMbinarySDDefaultLaunchPermission = $converter.SDDLToBinarySD($NewDCOMSDDLDefaultLaunchPermission)
+          $DCOMconvertedPermissionDefaultLaunchPermission = ,$DCOMbinarySDDefaultLaunchPermission.BinarySD
+
+          $DCOMbinarySDDefaultAccessPermission = $converter.SDDLToBinarySD($NewDCOMSDDLDefaultAccessPermission)
+          $DCOMconvertedPermissionsDefaultAccessPermission = ,$DCOMbinarySDDefaultAccessPermission.BinarySD
+
+          # Apply the changes
+          write-host "`tApplying changes..."
+          if ($CurrentDCOMSDDLDefaultLaunchPermission.SDDL -match $DCOMSDDLDefaultLaunchPermission)
+          {
+            write-host "`t`tCurrent DefaultLaunchPermission matches desired value."
+          }
+          else
+          {
+            $result = $Reg.SetBinaryValue(2147483650,"software\microsoft\ole","DefaultLaunchPermission", $DCOMbinarySDDefaultLaunchPermission.binarySD)
+            if($result.ReturnValue='0'){write-host "  Applied DefaultLaunchPermission complete."}
+          }
+
+          if ($CurrentDCOMSDDLDefaultAccessPermission.SDDL -match $DCOMSDDLDefaultAccessPermision)
+          {
+            write-host "`t`tCurrent DefaultAccessPermission matches desired value."
+          }
+          else
+          {
+            $result = $Reg.SetBinaryValue(2147483650,"software\microsoft\ole","DefaultAccessPermission", $DCOMbinarySDDefaultAccessPermission.binarySD)
+            if($result.ReturnValue='0'){write-host "  Applied DefaultAccessPermission complete."}
+
+          }
+          }
+          #----------------------------------------------------------------------------------------------------------
+          trap
+          {
+          $exMessage = $_.Exception.Message
+          if($exMessage.StartsWith("L:"))
+          {write-host "`n" $exMessage.substring(2) "`n" -foregroundcolor white -backgroundcolor darkblue}
+          else {write-host "`nError: " $exMessage "`n" -foregroundcolor white -backgroundcolor darkred}
+          Exit
+          }
+          #----------------------------------------------------------------------------------------------------------
+
+#    - name: Inicializando os endpoints
+#      ansible.windows.win_powershell:
+#        script: |
+#          $Database="bookshelf"
+#          $BackupFolder="SQLBackup"
+#          $node1 = "bookshelf-sql1"
+#          $node2 = "bookshelf-sql2"
+#          $Domain = "example-gcp.local"
+#          $SharedLocation="\\$node2\$BackupFolder"
+#          $ListenerName="sql-listener"
+#          $AGName="MainAG"
+#          $PrimaryServer = "$node1.$Domain\MSSQLSERVER"
+#          $SecondaryServer = "$node2.$Domain\MSSQLSERVER"
+#          
+#          $endpoint1=New-SqlHADREndpoint -Port 5022 -Owner sa `
+#              -Encryption Supported -EncryptionAlgorithm Aes `
+#              -Name AlwaysonEndpoint1 `
+#              -Path "SQLSERVER:\SQL\$node1.$Domain\Default"
+#          Set-SqlHADREndpoint -InputObject $endpoint1 -State Started
+#          $endpoint2=New-SqlHADREndpoint -Port 5022 -Owner sa `
+#              -Encryption Supported -EncryptionAlgorithm Aes `
+#              -Name AlwaysonEndpoint2 `
+#              -Path "SQLSERVER:\SQL\$node2.$Domain\Default"
+#          Set-SqlHADREndpoint -InputObject $endpoint2 -State Started
